@@ -20,6 +20,7 @@ export const DashboardScreen: React.FC = () => {
     domainPolicy,
     updateDomainPolicy,
     auditLogs,
+    users,
   } = useAuth();
 
   const [isEditingDomain, setIsEditingDomain] = useState(false);
@@ -28,10 +29,22 @@ export const DashboardScreen: React.FC = () => {
   const [syncStatus, setSyncStatus] = useState<string | null>(null);
   const [showSql, setShowSql] = useState(false);
   const [copiedSql, setCopiedSql] = useState(false);
+  const [directorySearch, setDirectorySearch] = useState('');
 
   if (!user) {
     return null;
   }
+
+  const filteredEmployees = (users || []).filter((u) => {
+    const q = directorySearch.toLowerCase().trim();
+    if (!q) return true;
+    return (
+      u.name.toLowerCase().includes(q) ||
+      u.email.toLowerCase().includes(q) ||
+      (u.department && u.department.toLowerCase().includes(q)) ||
+      (u.title && u.title.toLowerCase().includes(q))
+    );
+  });
 
   const handleSaveDomain = () => {
     const cleaned = newDomainInput.trim().toLowerCase().replace(/^@/, '');
@@ -157,6 +170,30 @@ export const DashboardScreen: React.FC = () => {
               </Text>
             </View>
           )}
+        </View>
+
+        {/* Corporate Metrics Row */}
+        <View style={styles.metricsRow}>
+          <View style={styles.metricCard}>
+            <Text style={styles.metricLabel}>COMPANY DOMAIN</Text>
+            <Text style={styles.metricValue}>@{domainPolicy.allowedDomain}</Text>
+            <Text style={styles.metricSub}>Strictly Enforced</Text>
+          </View>
+          <View style={styles.metricCard}>
+            <Text style={styles.metricLabel}>VERIFIED PERSONNEL</Text>
+            <Text style={styles.metricValue}>{users?.length || 4} Staff</Text>
+            <Text style={styles.metricSub}>Active Accounts</Text>
+          </View>
+          <View style={styles.metricCard}>
+            <Text style={styles.metricLabel}>CLOUD STORAGE</Text>
+            <Text style={styles.metricValue}>Supabase</Text>
+            <Text style={styles.metricSub}>{SUPABASE_PROJECT_ID}</Text>
+          </View>
+          <View style={styles.metricCard}>
+            <Text style={styles.metricLabel}>AUTH SYSTEM</Text>
+            <Text style={styles.metricValue}>OAuth 2.0</Text>
+            <Text style={styles.metricSub}>Google Workspace</Text>
+          </View>
         </View>
 
         {/* Grid of Essential Corporate Features */}
@@ -287,6 +324,83 @@ export const DashboardScreen: React.FC = () => {
                 </Text>
               </View>
             )}
+          </View>
+        </View>
+
+        {/* Verified Company Employee Directory */}
+        <View style={styles.directoryCard}>
+          <View style={styles.directoryHeaderRow}>
+            <View>
+              <Text style={styles.cardTitle}>Verified Company Directory</Text>
+              <Text style={styles.logSubtitle}>
+                Official corporate accounts authenticated under @{domainPolicy.allowedDomain} with role assignments.
+              </Text>
+            </View>
+            <View style={styles.directoryCountBadge}>
+              <Text style={styles.directoryCountText}>{filteredEmployees.length} Verified Staff</Text>
+            </View>
+          </View>
+
+          {/* Directory Search Box */}
+          <View style={styles.directorySearchRow}>
+            <TextInput
+              style={styles.directorySearchInput}
+              placeholder="Search directory by name, email, department, or role..."
+              placeholderTextColor="#9CA3AF"
+              value={directorySearch}
+              onChangeText={setDirectorySearch}
+              autoCapitalize="none"
+            />
+            {directorySearch.length > 0 && (
+              <TouchableOpacity onPress={() => setDirectorySearch('')} style={styles.clearSearchBtn}>
+                <Text style={styles.clearSearchBtnText}>Clear</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          {/* Employee Cards Grid */}
+          <View style={styles.employeeGrid}>
+            {filteredEmployees.map((emp) => (
+              <View key={emp.id} style={styles.employeeCard}>
+                <View style={styles.employeeHeader}>
+                  {emp.avatarUrl ? (
+                    <Image source={{ uri: emp.avatarUrl }} style={styles.employeeAvatar} />
+                  ) : (
+                    <View style={styles.employeeAvatarFallback}>
+                      <Text style={styles.employeeAvatarInitial}>
+                        {(emp.name || 'E').charAt(0).toUpperCase()}
+                      </Text>
+                    </View>
+                  )}
+                  <View style={{ flex: 1, minWidth: 0 }}>
+                    <View style={styles.empNameRow}>
+                      <Text style={styles.employeeName} numberOfLines={1}>{emp.name}</Text>
+                      <View style={[styles.empRoleChip, emp.role === 'admin' ? styles.empRoleAdmin : styles.empRoleUser]}>
+                        <Text style={[styles.empRoleText, emp.role === 'admin' ? styles.empRoleAdminText : styles.empRoleUserText]}>
+                          {emp.role.toUpperCase()}
+                        </Text>
+                      </View>
+                    </View>
+                    <Text style={styles.employeeTitle} numberOfLines={1}>{emp.title || 'Staff'}</Text>
+                  </View>
+                </View>
+
+                <View style={styles.employeeDetailsBox}>
+                  <View style={styles.empDetailRow}>
+                    <Text style={styles.empDetailKey}>Email:</Text>
+                    <Text style={styles.empDetailVal} numberOfLines={1}>{emp.email}</Text>
+                  </View>
+                  <View style={styles.empDetailRow}>
+                    <Text style={styles.empDetailKey}>Department:</Text>
+                    <Text style={styles.empDetailVal} numberOfLines={1}>{emp.department || 'Corporate'}</Text>
+                  </View>
+                  <View style={styles.empDetailRow}>
+                    <Text style={styles.empDetailKey}>Joined:</Text>
+                    <Text style={styles.empDetailVal}>{emp.joinedAt || '2024'}</Text>
+                  </View>
+                </View>
+              </View>
+            ))}
           </View>
         </View>
 
@@ -604,6 +718,44 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#6B7280',
   },
+  metricsRow: {
+    flexDirection: 'row',
+    gap: 16,
+    marginBottom: 24,
+    flexWrap: 'wrap',
+  },
+  metricCard: {
+    flex: 1,
+    minWidth: 200,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    padding: 16,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  metricLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#6B7280',
+    letterSpacing: 0.8,
+    marginBottom: 6,
+  },
+  metricValue: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#111827',
+    marginBottom: 2,
+  },
+  metricSub: {
+    fontSize: 11,
+    color: '#10B981',
+    fontWeight: '500',
+  },
   cardGrid: {
     flexDirection: 'row',
     gap: 20,
@@ -843,6 +995,172 @@ const styles = StyleSheet.create({
     color: '#9CA3AF',
     marginTop: 8,
     fontStyle: 'italic',
+  },
+  directoryCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    padding: 22,
+    marginBottom: 24,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.03,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  directoryHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  directoryCountBadge: {
+    backgroundColor: '#F3F4F6',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 6,
+  },
+  directoryCountText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#111827',
+  },
+  directorySearchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+    gap: 8,
+  },
+  directorySearchInput: {
+    flex: 1,
+    height: 40,
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    borderRadius: 8,
+    paddingHorizontal: 14,
+    fontSize: 13,
+    backgroundColor: '#F9FAFB',
+    color: '#111827',
+  },
+  clearSearchBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    backgroundColor: '#F3F4F6',
+    borderRadius: 6,
+  },
+  clearSearchBtnText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#4B5563',
+  },
+  employeeGrid: {
+    display: 'grid' as any,
+    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' as any,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 14,
+  },
+  employeeCard: {
+    flex: 1,
+    minWidth: 260,
+    backgroundColor: '#FAFAFA',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 10,
+    padding: 14,
+  },
+  employeeHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 12,
+  },
+  employeeAvatar: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+  },
+  employeeAvatarFallback: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#111827',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  employeeAvatarInitial: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 18,
+  },
+  empNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 2,
+    flexWrap: 'wrap',
+  },
+  employeeName: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#111827',
+  },
+  empRoleChip: {
+    paddingVertical: 2,
+    paddingHorizontal: 6,
+    borderRadius: 4,
+  },
+  empRoleAdmin: {
+    backgroundColor: '#EFF6FF',
+    borderWidth: 1,
+    borderColor: '#BFDBFE',
+  },
+  empRoleUser: {
+    backgroundColor: '#F3F4F6',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  empRoleText: {
+    fontSize: 9,
+    fontWeight: '700',
+  },
+  empRoleAdminText: {
+    color: '#1D4ED8',
+  },
+  empRoleUserText: {
+    color: '#4B5563',
+  },
+  employeeTitle: {
+    fontSize: 12,
+    color: '#6B7280',
+  },
+  employeeDetailsBox: {
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+    paddingTop: 8,
+    gap: 4,
+  },
+  empDetailRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  empDetailKey: {
+    fontSize: 11,
+    color: '#6B7280',
+  },
+  empDetailVal: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#111827',
+    maxWidth: 180,
   },
   logCard: {
     backgroundColor: '#FFFFFF',

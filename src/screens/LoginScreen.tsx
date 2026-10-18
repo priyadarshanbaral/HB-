@@ -207,6 +207,29 @@ export const LoginScreen: React.FC = () => {
           </View>
         </View>
 
+        {/* Enterprise System Highlights */}
+        <View style={styles.systemInfoCard}>
+          <Text style={styles.systemInfoTitle}>AUTHORIZED CORPORATE DIVISIONS (@{domainPolicy.allowedDomain})</Text>
+          <View style={styles.divisionGrid}>
+            <View style={styles.divisionItem}>
+              <Text style={styles.divisionName}>🛡️ Corporate IT & Security</Text>
+              <Text style={styles.divisionDesc}>Identity & Access Architecture</Text>
+            </View>
+            <View style={styles.divisionItem}>
+              <Text style={styles.divisionName}>🔬 Health & Research</Text>
+              <Text style={styles.divisionDesc}>Biometric Analysis & Performance</Text>
+            </View>
+            <View style={styles.divisionItem}>
+              <Text style={styles.divisionName}>⚙️ Product Operations</Text>
+              <Text style={styles.divisionDesc}>Fitness Tech & Hardware</Text>
+            </View>
+            <View style={styles.divisionItem}>
+              <Text style={styles.divisionName}>👔 Executive Leadership</Text>
+              <Text style={styles.divisionDesc}>Compliance & Governance</Text>
+            </View>
+          </View>
+        </View>
+
         {/* Corporate Sub-footer */}
         <View style={styles.footerNote}>
           <Text style={styles.footerNoteText}>
@@ -575,5 +598,43 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 12,
     fontWeight: '600',
+  },
+  systemInfoCard: {
+    width: '100%',
+    maxWidth: 460,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    padding: 16,
+    marginTop: 16,
+  },
+  systemInfoTitle: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#6B7280',
+    letterSpacing: 0.8,
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  divisionGrid: {
+    gap: 8,
+  },
+  divisionItem: {
+    backgroundColor: '#F9FAFB',
+    borderWidth: 1,
+    borderColor: '#F3F4F6',
+    borderRadius: 6,
+    padding: 8,
+  },
+  divisionName: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#111827',
+  },
+  divisionDesc: {
+    fontSize: 11,
+    color: '#6B7280',
+    marginTop: 1,
   },
 });
