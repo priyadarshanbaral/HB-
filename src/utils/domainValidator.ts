@@ -26,13 +26,21 @@ export function validateEmailDomain(
   allowedDomain: string = 'hbplus.fit',
   allowSubdomains: boolean = false
 ): DomainValidationResult {
-  const email = (rawEmail || '').trim().toLowerCase();
+  if (!rawEmail || typeof rawEmail !== 'string') {
+    return {
+      isValid: false,
+      email: rawEmail || '',
+      domain: '',
+      normalizedEmail: '',
+      errorMessage: 'Please enter a valid email address.',
+    };
+  }
 
-  // Basic email structure validation
-  const emailRegex = /^[^\s@]+@([^\s@]+)$/;
-  const match = email.match(emailRegex);
+  const email = rawEmail.trim().toLowerCase();
 
-  if (!match) {
+  // Validate format and ensure single @ separator
+  const atParts = email.split('@');
+  if (atParts.length !== 2 || !atParts[0] || !atParts[1]) {
     return {
       isValid: false,
       email: rawEmail,
@@ -42,14 +50,26 @@ export function validateEmailDomain(
     };
   }
 
-  const emailDomain = match[1].toLowerCase();
+  const [localPart, domainPart] = atParts;
+
+  // Basic check on local part and domain part
+  if (localPart.includes(' ') || domainPart.includes(' ') || !domainPart.includes('.')) {
+    return {
+      isValid: false,
+      email: rawEmail,
+      domain: domainPart,
+      normalizedEmail: email,
+      errorMessage: 'Please enter a valid email address.',
+    };
+  }
+
   const target = allowedDomain.trim().toLowerCase().replace(/^@/, '');
 
   let isMatch = false;
 
-  if (emailDomain === target) {
+  if (domainPart === target) {
     isMatch = true;
-  } else if (allowSubdomains && emailDomain.endsWith('.' + target)) {
+  } else if (allowSubdomains && domainPart.endsWith('.' + target)) {
     isMatch = true;
   }
 
@@ -57,16 +77,16 @@ export function validateEmailDomain(
     return {
       isValid: false,
       email: rawEmail,
-      domain: emailDomain,
+      domain: domainPart,
       normalizedEmail: email,
-      errorMessage: `Access denied. Only @${target} company accounts are authorized to access this application. Account domain '@${emailDomain}' is not permitted.`,
+      errorMessage: RESTRICTED_DOMAIN_ERROR_MESSAGE,
     };
   }
 
   return {
     isValid: true,
     email: rawEmail,
-    domain: emailDomain,
+    domain: domainPart,
     normalizedEmail: email,
   };
 }

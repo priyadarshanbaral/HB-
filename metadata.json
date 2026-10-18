@@ -1,6 +1,6 @@
 {
-  "name": "HBPlus Domain-Restricted Auth",
-  "description": "Cross-platform React Native for Web authentication app with Google OAuth, strict email domain validation (@hbplus.fit), role-based dashboard, and dual mobile/web views.",
+  "name": "HB+ Company Authentication Application",
+  "description": "Secure company portal with Google OAuth authentication restricted strictly to @hbplus.fit corporate accounts and persistent Supabase database storage.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": []
 }

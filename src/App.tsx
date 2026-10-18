@@ -3,7 +3,6 @@ import { View, ActivityIndicator, StyleSheet, Text } from 'react-native';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LoginScreen } from './screens/LoginScreen';
 import { DashboardScreen } from './screens/DashboardScreen';
-import { DevicePreviewContainer } from './components/layout/DevicePreviewContainer';
 
 function AppContent() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -12,15 +11,15 @@ function AppContent() {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#000000" />
-        <Text style={styles.loadingText}>Loading...</Text>
+        <Text style={styles.loadingText}>Loading HB+ Portal...</Text>
       </View>
     );
   }
 
   return (
-    <DevicePreviewContainer>
+    <View style={styles.websiteRoot}>
       {isAuthenticated ? <DashboardScreen /> : <LoginScreen />}
-    </DevicePreviewContainer>
+    </View>
   );
 }
 
@@ -33,6 +32,12 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
+  websiteRoot: {
+    flex: 1,
+    minHeight: '100vh' as any,
+    width: '100%',
+    backgroundColor: '#FAFAFA',
+  },
   loadingContainer: {
     flex: 1,
     minHeight: '100vh' as any,

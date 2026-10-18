@@ -1,231 +1,180 @@
-# HBPlus Fit - Cross-Platform Domain-Restricted Google Authentication
+# HB+ Company Authentication Application
 
-<p align="center">
-  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_edjoyVXOIzBGFLCFUNBeKgdyufmCdt38_M8d9QhoTQ&s=10" alt="HBPlus Fit Official Logo" width="120" style="border-radius: 16px;" />
-</p>
-
-A secure cross-platform application built with **React Native (and React Native for Web)** supporting both **Mobile (iOS & Android)** and **Web** environments from a single unified codebase.
-
-The application enforces strict **Google OAuth 2.0 authentication** restricted exclusively to corporate accounts ending in `@hbplus.fit`.
+A secure enterprise intranet web application for **HB+** with Google OAuth 2.0 authentication strictly restricted to approved corporate accounts ending in `@hbplus.fit`, featuring persistent cloud data storage powered by **Supabase**.
 
 ---
 
-## 🌟 Key Highlights
+## 🚀 Overview
 
-- **Single Cross-Platform Codebase**: Pure React Native components (`View`, `Text`, `TouchableOpacity`, `StyleSheet`, `ActivityIndicator`) rendered seamlessly on web browsers and mobile emulators.
-- **Strict Domain Verification**:
-  - `user@hbplus.fit` ➔ **Access Granted** (JWT generated, session established, redirected to protected Dashboard).
-  - `user@gmail.com` or other external domains ➔ **Access Blocked** with exact error message:  
-    `"Access restricted. Please login using your official domain email."`
-- **Role-Based Access Control (RBAC)**:
-  - **Admin**: Full access to Organization Overview, Employee Directory Management, Domain Policy Whitelist Configuration, and Security Audit Logs.
-  - **User**: Protected Employee Portal, Biometrics & Fitness Passes, and Corporate Directory.
-- **Persistent Storage & Security Audit Logs**:
-  - Tracks every successful login and denied access attempt with timestamps, IP/device agent, and domain reason.
-- **Interactive Multi-Platform Preview**:
-  - In-app toggle between **Full Web Browser View**, **Apple iPhone 16 Pro Simulator**, and **Google Pixel 8 Simulator**.
-- **Interactive Domain Testing Suite**:
-  - One-tap testing for authorized admin (`alex.morgan@hbplus.fit`), regular user (`sarah.chen@hbplus.fit`), rejected Gmail user (`priyadrshanbaral@gmail.com`), and customizable email tester.
+- **Configured Company Domain**: `hbplus.fit`
+- **Supabase Project ID**: `zwmzzdcbxccfdqqyrvut`
+- **Supabase API Key**: `sb_publishable_CGiqIUKKO4bYMjbxi9vUwA_f_TW8l6G`
+- **Target URL**: `https://zwmzzdcbxccfdqqyrvut.supabase.co`
+
+### Domain Enforcement Rules:
+- `employee@hbplus.fit` ➔ **Access Allowed** (Session token issued, profile stored, user enters protected Dashboard).
+- `employee@gmail.com` ➔ **Access Denied** (`"Access restricted. Please login using your official domain email."`).
+- `employee@yahoo.com` ➔ **Access Denied**.
+- `employee@hbplus.fit.example.com` ➔ **Access Denied** (Subdomain spoofing blocked).
+- `employee@not-hbplus.fit` ➔ **Access Denied** (Typosquatting/lookalike blocked).
 
 ---
 
-## 🏗️ Architecture & Clean Folder Structure
+## 🛠️ Technology Stack
 
-```
-├── README.md                      # Complete setup & architecture documentation
-├── package.json                   # Dependencies & build scripts
-├── index.html                     # Web entry point with Google Identity Services
-├── metadata.json                  # AI Studio App configuration
-├── vite.config.ts                 # Vite bundler with React Native for Web alias
-├── tsconfig.json                  # Strict TypeScript configuration
-└── src/
-    ├── main.tsx                   # React 19 root bootstrap
-    ├── App.tsx                    # Root coordinator & protected route guard
-    ├── types/
-    │   └── auth.ts                # TypeScript interfaces (User, AuthToken, DomainPolicy, AuditLog)
-    ├── utils/
-    │   └── domainValidator.ts     # Domain extraction & regex validation logic
-    ├── services/
-    │   ├── authService.ts         # Google OAuth handler, JWT parser, token minting
-    │   └── storageService.ts      # Persistent session, user directory database & audit logs
-    ├── context/
-    │   └── AuthContext.tsx        # React Context for global auth state & actions
-    ├── screens/
-    │   ├── LoginScreen.tsx        # React Native Login Screen with Google OAuth & domain tester
-    │   └── DashboardScreen.tsx    # Protected Dashboard with RBAC (Admin & User views)
-    └── components/
-        ├── auth/
-        │   ├── GoogleLogo.tsx     # Vector Google brand icon
-        │   └── GoogleOAuthModal.tsx # Google Account picker & email tester dialog
-        ├── common/
-        │   ├── RNButton.tsx       # React Native button primitive with variants & loading state
-        │   ├── RNCard.tsx         # React Native card container
-        │   ├── RNBadge.tsx        # Role & status badge indicators
-        │   └── RNAlert.tsx        # Error banner with exact restriction messaging
-        ├── layout/
-        │   └── DevicePreviewContainer.tsx # Mobile / Web live viewport emulator
-        └── docs/
-            └── ReadmeModal.tsx    # In-app interactive documentation modal
+- **Frontend**: React 19, React Native Web, TypeScript, Vite
+- **Styling**: Vanilla CSS & Tailwind CSS styling primitives
+- **Authentication**: Google OAuth 2.0 Identity Services + JWT Token verification
+- **Database / Cloud Backend**: Supabase (PostgreSQL tables for `employees` and `audit_logs`)
+- **Testing**: Node.js Test Runner with `tsx` (`npm test`)
+
+---
+
+## 📂 Project Structure
+
+```text
+HB-/
+├── src/
+│   ├── components/
+│   │   ├── auth/
+│   │   │   ├── GoogleLogo.tsx         # Google brand SVG icon
+│   │   │   └── GoogleOAuthModal.tsx   # Google Account selector & identity dialog
+│   │   ├── common/
+│   │   │   └── BrandLogo.tsx          # HB+ corporate vector logo
+│   │   └── layout/
+│   │       └── DevicePreviewContainer.tsx
+│   ├── context/
+│   │   └── AuthContext.tsx            # Global centralized authentication provider
+│   ├── screens/
+│   │   ├── LoginScreen.tsx            # Corporate login page with domain test sandbox
+│   │   └── DashboardScreen.tsx        # Protected dashboard with profile & audit logs
+│   ├── services/
+│   │   ├── authService.ts             # Domain validation and session token generator
+│   │   ├── storageService.ts          # Session caching & Supabase synchronization
+│   │   └── supabaseClient.ts          # Supabase client (`zwmzzdcbxccfdqqyrvut`)
+│   ├── utils/
+│   │   └── domainValidator.ts         # Strict domain validation engine
+│   ├── types/
+│   │   └── auth.ts                    # TypeScript types (User, AuthToken, AuditLog)
+│   ├── App.tsx                        # Root application coordinator
+│   └── main.tsx                       # Web mounting entrypoint
+├── tests/
+│   └── domainValidator.test.ts        # Comprehensive unit tests
+├── .env                               # Active local environment variables
+├── .env.example                       # Template for environment configuration
+├── .gitignore                         # Git exclusion rules
+├── package.json                       # Dependencies & scripts
+├── tsconfig.json                      # TypeScript configuration
+├── vite.config.ts                     # Vite bundler configuration
+└── README.md                          # Documentation
 ```
 
 ---
 
-## 🔒 Authentication & Domain Restriction Flow
+## 🗄️ Supabase Cloud Database Setup
 
-```
-+-------------------------------------------------------------+
-|                     User clicks                             |
-|              [ Sign in with Google ]                        |
-+-------------------------------------------------------------+
-                               |
-                               v
-+-------------------------------------------------------------+
-|           Google OAuth 2.0 Identity Consent Flow            |
-|       (Returns email, name, avatar, and JWT ID token)       |
-+-------------------------------------------------------------+
-                               |
-                               v
-+-------------------------------------------------------------+
-|              Domain Validation Inspection Point             |
-|                targetDomain = "hbplus.fit"                  |
-+-------------------------------------------------------------+
-               /                               \
-              /                                 \
-  Matches @hbplus.fit?                 Does NOT match @hbplus.fit?
-            /                                     \
-           v                                       v
-+-----------------------+              +-------------------------------+
-|  STATUS: ALLOWED      |              |  STATUS: BLOCKED              |
-|  - Mint Session Token |              |  - Log Security Audit Event   |
-|  - Upsert in Database |              |  - Display Error Banner:      |
-|  - Redirect to        |              |    "Access restricted. Please |
-|    Protected Dashboard|              |     login using your official |
-+-----------------------+              |     domain email."            |
-                                       +-------------------------------+
-```
+This application connects to Supabase project `zwmzzdcbxccfdqqyrvut`.
 
-### Detailed Validation Rules:
-1. Normalizes email: `trim().toLowerCase()`.
-2. Extracts domain part following `@`.
-3. Verifies against configured allowed domain (default `hbplus.fit`).
-4. Rejects all public email providers (`gmail.com`, `yahoo.com`, `outlook.com`, etc.) and mismatched corporate domains.
-5. Emits an immutable audit log entry with timestamp and client device metadata.
+### 1. SQL Schema Execution
+To create the necessary tables in Supabase:
+1. Open the [Supabase SQL Editor](https://supabase.com/dashboard/project/zwmzzdcbxccfdqqyrvut/sql).
+2. Paste and run the following SQL script:
+
+```sql
+-- 1. Employees Directory Table
+create table if not exists public.employees (
+  id text primary key,
+  name text not null,
+  email text unique not null,
+  avatar_url text,
+  domain text default 'hbplus.fit',
+  role text default 'user',
+  department text default 'Corporate Health',
+  title text default 'Team Member',
+  joined_at text,
+  last_login_at text,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- 2. Audit Logs Table (Tracks Allowed & Blocked Logins)
+create table if not exists public.audit_logs (
+  id text primary key,
+  event text not null,
+  email text not null,
+  status text not null,
+  details text,
+  device text,
+  timestamp bigint not null,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- 3. Row Level Security (RLS) Policies
+alter table public.employees enable row level security;
+alter table public.audit_logs enable row level security;
+
+create policy "Public read and write for employees" on public.employees
+  for all using (true) with check (true);
+
+create policy "Public read and write for audit logs" on public.audit_logs
+  for all using (true) with check (true);
+```
 
 ---
 
-## 🚀 Setup & Installation Instructions
+## 💻 Local Development
 
-### Web Execution (Vite + React Native for Web)
+### 1. Install Dependencies
 ```bash
-# 1. Install dependencies
-npm install
+npm install --legacy-peer-deps
+```
 
-# 2. Start the development server
+### 2. Run Automated Unit Tests
+```bash
+npm test
+```
+*Validates 6 automated test scenarios:*
+- Authorized `@hbplus.fit` emails are allowed
+- Case normalization (`Employee@HBPLUS.FIT` ➔ allowed)
+- Common external domains (`@gmail.com`, `@yahoo.com`) are denied
+- Spoofed and lookalike domains (`@hbplus.fit.example.com`, `@not-hbplus.fit`) are denied
+- Missing or malformed emails are rejected
+- Google token payload verification
+
+### 3. Run Dev Server
+```bash
 npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) in your web browser.
 
-# 3. Build for production
+### 4. Build for Production
+```bash
 npm run build
 ```
-
-### React Native Mobile (Expo / Bare React Native)
-Because the codebase uses pure React Native primitives (`View`, `Text`, `TouchableOpacity`, `StyleSheet`, `ActivityIndicator`, `ScrollView`, `TextInput`), the same screens drop directly into an Expo or bare React Native project:
-```bash
-# In an Expo project:
-npx create-expo-app HBPlusMobile --template blank-typescript
-cd HBPlusMobile
-npm install @react-native-async-storage/async-storage
-
-# Copy screens and components from /src
-npx expo start
-```
+Generates production-optimized web assets in the `dist/` directory.
 
 ---
 
-## 🛡️ Security Best Practices & Token Architecture
+## 🌐 Netlify Deployment
 
-### 1. Raw ID Token Decomposition (RFC 7519)
-The application handles authentic OpenID Connect (OIDC) ID tokens issued by Google Identity Services, composed of three Base64URL-encoded segments:
-```
-header.payload.signature
-```
-
-#### Example Valid Token (Authorized @hbplus.fit Domain):
-```
-eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Imdvb2dsZS1rZXktaWQtOTgxMiJ9.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJzdWIiOiJnb29nbGVfb2F1dGhfcHF6dzg2MGFldCIsImF6cCI6ImhicGx1cy1maXQtYXBwLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwiYXVkIjoiaGJwbHVzLWZpdC1hcHAuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJlbWFpbCI6ImFsZXgubW9yZ2FuQGhicGx1cy5maXQiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiaGQiOiJoYnBsdXMuZml0IiwibmFtZSI6IkFsZXggTW9yZ2FuIiwicGljdHVyZSI6Imh0dHBzOi8vaW1hZ2VzLnVuc3BsYXNoLmNvbS9waG90by0xNTM0NTI4NzQxNzc1LTUzOTk0YTY5ZGFlYj9hdXRvPWZvcm1hdCZmaXQ9Y3JvcCZ3PTIwMCZoPTIwMCZxPTgwIiwiZ2l2ZW5fbmFtZSI6IkFsZXgiLCJmYW1pbHlfbmFtZSI6Ik1vcmdhbiIsImlhdCI6MTc5MjI2NjQ0MywiZXhwIjoxNzkyMjcwMDQzfQ==.dmVyaWZpZWRfcnNhX3NpZ25hdHVyZV9tb2NrXzE3OTIyNjY0NDM4NTI=
-```
-
-#### Decoded Structure:
-1. **Header (JOSE)**:
-   ```json
-   {
-     "alg": "RS256",
-     "typ": "JWT",
-     "kid": "google-key-id-9812"
-   }
+1. **Build Settings**:
+   - **Build command**: `npm run build`
+   - **Publish directory**: `dist`
+2. **Environment Variables**:
+   Configure these in Netlify site settings (**Site configuration** ➔ **Environment variables**):
+   - `VITE_SUPABASE_URL`: `https://zwmzzdcbxccfdqqyrvut.supabase.co`
+   - `VITE_SUPABASE_ANON_KEY`: `sb_publishable_CGiqIUKKO4bYMjbxi9vUwA_f_TW8l6G`
+   - `VITE_ALLOWED_DOMAIN`: `hbplus.fit`
+3. **Single Page Application Redirects**:
+   A `_redirects` rule ensures client-side routing works:
+   ```text
+   /* /index.html 200
    ```
-   Specifies RSASSA-PKCS1-v1_5 digital signature with SHA-256. Google's public certificates are retrieved from `https://www.googleapis.com/oauth2/v3/certs`.
-
-2. **Payload Claims**:
-   ```json
-   {
-     "iss": "https://accounts.google.com",
-     "sub": "google_oauth_pqzw860aet",
-     "azp": "hbplus-fit-app.apps.googleusercontent.com",
-     "aud": "hbplus-fit-app.apps.googleusercontent.com",
-     "email": "alex.morgan@hbplus.fit",
-     "email_verified": true,
-     "hd": "hbplus.fit",
-     "name": "Alex Morgan",
-     "picture": "https://images.unsplash.com/...",
-     "given_name": "Alex",
-     "family_name": "Morgan",
-     "iat": 1792266443,
-     "exp": 1792270043
-   }
-   ```
-   - **`"hd": "hbplus.fit"`**: The **Hosted Domain claim**. Google Workspace accounts automatically embed this claim. Regular `@gmail.com` accounts do NOT have this claim, ensuring airtight domain rejection at the cryptographic boundary.
-   - **`"email"`**: The user's corporate email address verified by Google.
-   - **`"exp"`**: UNIX timestamp when the token expires (3600 seconds validity).
-
-3. **Digital Signature**:
-   ```
-   RSASHA256(base64Url(header) + "." + base64Url(payload), google_private_key)
-   ```
-   Guarantees that no party can modify the email or claims without invalidating the cryptographic signature.
 
 ---
 
-### 2. Stateless Route Protection Architecture
-1. **Route Guard**: The router checks for an active session token before rendering protected views (`/dashboard`).
-2. **Stateless Verification**: The client/backend validates the signature using Google's public keys without requiring continuous database roundtrips.
-3. **Hosted Domain Check**: The validator confirms `token.payload.hd === "hbplus.fit"` and `email.endsWith("@hbplus.fit")`.
-4. **Denial & Audit**: If any unauthorized domain attempts authentication:
-   - Access is blocked.
-   - An immutable audit entry (`LOGIN_REJECTED_DOMAIN`) is recorded.
-   - The user sees: `"Access restricted. Please login using your official domain email."`
+## 🔒 Security Best Practices
 
----
-
-## ⚙️ Google Cloud Console OAuth 2.0 Setup
-
-To connect live production Google OAuth 2.0 credentials:
-
-1. **Open Google Cloud Console**:
-   - Navigate to **APIs & Services** ➔ **Credentials**.
-   - Click **Create Credentials** ➔ **OAuth Client ID**.
-   - Select **Application type**: **Web application**.
-
-2. **Configure Authorized Origins**:
-   - **Authorized JavaScript origins**:
-     - `http://localhost:3000` (Local testing)
-     - `https://your-domain.run.app` (Cloud Run production)
-   - **Authorized redirect URIs**:
-     - `http://localhost:3000` (for popup/GIS flows)
-
-3. **Configure Scopes**:
-   - `openid`
-   - `https://www.googleapis.com/auth/userinfo.email`
-   - `https://www.googleapis.com/auth/userinfo.profile`
-
-4. **Google Workspace Domain Linking**:
-   - In Google Workspace Admin, verify that `@hbplus.fit` is configured as a Primary or Secondary domain. All users created under this domain will automatically receive the `"hd": "hbplus.fit"` claim in their ID tokens.
+1. **Strict RFC-Compliant Domain Extraction**: The domain validator checks strictly the tokenized portion after the `@` symbol, eliminating false positives from string inclusion bugs like `email.includes("hbplus.fit")`.
+2. **Cryptographic Token Verification**: Real Google OAuth JWTs contain the `hd: "hbplus.fit"` Hosted Domain claim signed by Google's private key.
+3. **Audit Trails**: Every login, blocked attempt, and logout is stamped with timestamp and recorded in Supabase's `audit_logs` table for compliance.
+4. **No Hardcoded Secrets**: Secrets and keys are managed via environment variables and standard public publishable key mechanics.

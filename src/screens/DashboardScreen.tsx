@@ -77,6 +77,11 @@ export const DashboardScreen: React.FC = () => {
               <Text style={styles.domainBadgeText}>@{domainPolicy.allowedDomain}</Text>
             </View>
 
+            <View style={styles.supabaseBadge}>
+              <View style={styles.supabaseDot} />
+              <Text style={styles.supabaseBadgeText}>Supabase: {SUPABASE_PROJECT_ID}</Text>
+            </View>
+
             <TouchableOpacity
               activeOpacity={0.8}
               onPress={logout}
@@ -385,6 +390,28 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     color: '#111827',
+  },
+  supabaseBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F0FDF4',
+    borderWidth: 1,
+    borderColor: '#BBF7D0',
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 6,
+  },
+  supabaseDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#16A34A',
+    marginRight: 6,
+  },
+  supabaseBadgeText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#166534',
   },
   logoutButton: {
     backgroundColor: '#000000',
