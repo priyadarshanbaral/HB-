@@ -26,6 +26,8 @@ export const DashboardScreen: React.FC = () => {
   const [newDomainInput, setNewDomainInput] = useState(domainPolicy.allowedDomain);
   const [domainSaveMessage, setDomainSaveMessage] = useState<string | null>(null);
   const [syncStatus, setSyncStatus] = useState<string | null>(null);
+  const [showSql, setShowSql] = useState(false);
+  const [copiedSql, setCopiedSql] = useState(false);
 
   if (!user) {
     return null;
@@ -41,15 +43,24 @@ export const DashboardScreen: React.FC = () => {
     setTimeout(() => setDomainSaveMessage(null), 3000);
   };
 
+  const handleCopySql = () => {
+    const script = supabaseService.getSqlSetupScript();
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(script);
+      setCopiedSql(true);
+      setTimeout(() => setCopiedSql(false), 3000);
+    }
+  };
+
   const handleManualSupabaseSync = async () => {
     setSyncStatus('Syncing to Supabase...');
     const ok = await supabaseService.syncUser(user);
     if (ok) {
-      setSyncStatus('Synced successfully to Supabase');
+      setSyncStatus('✓ Successfully stored in Supabase');
     } else {
-      setSyncStatus('Local session saved (Supabase online)');
+      setSyncStatus('Session stored locally (Tables need SQL init)');
     }
-    setTimeout(() => setSyncStatus(null), 3000);
+    setTimeout(() => setSyncStatus(null), 3500);
   };
 
   return (
@@ -238,14 +249,44 @@ export const DashboardScreen: React.FC = () => {
               </View>
             </View>
 
-            <TouchableOpacity
-              onPress={handleManualSupabaseSync}
-              style={styles.syncBtn}
-            >
-              <Text style={styles.syncBtnText}>
-                {syncStatus || 'Sync Current Session to Supabase'}
-              </Text>
-            </TouchableOpacity>
+            <View style={styles.syncBtnRow}>
+              <TouchableOpacity
+                onPress={handleManualSupabaseSync}
+                style={[styles.syncBtn, { flex: 1, marginTop: 0 }]}
+              >
+                <Text style={styles.syncBtnText}>
+                  {syncStatus || 'Sync to Supabase Now'}
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => setShowSql(!showSql)}
+                style={styles.sqlToggleBtn}
+              >
+                <Text style={styles.sqlToggleBtnText}>
+                  {showSql ? 'Hide SQL' : 'View SQL Setup'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {showSql && (
+              <View style={styles.sqlBox}>
+                <View style={styles.sqlHeaderRow}>
+                  <Text style={styles.sqlBoxTitle}>POSTGRESQL SCHEMA (SQL EDITOR)</Text>
+                  <TouchableOpacity onPress={handleCopySql} style={styles.copySqlBtn}>
+                    <Text style={styles.copySqlBtnText}>
+                      {copiedSql ? '✓ Copied to Clipboard!' : 'Copy SQL Script'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                <Text style={styles.sqlCodeSnippet}>
+                  {supabaseService.getSqlSetupScript()}
+                </Text>
+                <Text style={styles.sqlHelpText}>
+                  Run this in Supabase SQL Editor (Project: {SUPABASE_PROJECT_ID}) to create the employees & audit_logs tables.
+                </Text>
+              </View>
+            )}
           </View>
         </View>
 
@@ -738,6 +779,70 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     color: '#111827',
+  },
+  syncBtnRow: {
+    flexDirection: 'row',
+    gap: 8,
+    alignItems: 'center',
+  },
+  sqlToggleBtn: {
+    backgroundColor: '#F3F4F6',
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    borderRadius: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+  },
+  sqlToggleBtnText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#4B5563',
+  },
+  sqlBox: {
+    marginTop: 12,
+    backgroundColor: '#111827',
+    borderRadius: 8,
+    padding: 12,
+  },
+  sqlHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#374151',
+    paddingBottom: 6,
+  },
+  sqlBoxTitle: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#9CA3AF',
+    letterSpacing: 0.8,
+  },
+  copySqlBtn: {
+    backgroundColor: '#2563EB',
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+  },
+  copySqlBtnText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  sqlCodeSnippet: {
+    fontSize: 10,
+    color: '#E5E7EB',
+    fontFamily: 'monospace',
+    lineHeight: 14,
+    maxHeight: 140,
+  },
+  sqlHelpText: {
+    fontSize: 10,
+    color: '#9CA3AF',
+    marginTop: 8,
+    fontStyle: 'italic',
   },
   logCard: {
     backgroundColor: '#FFFFFF',
