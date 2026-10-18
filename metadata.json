@@ -1,0 +1,6 @@
+{
+  "name": "HBPlus Domain-Restricted Auth",
+  "description": "Cross-platform React Native for Web authentication app with Google OAuth, strict email domain validation (@hbplus.fit), role-based dashboard, and dual mobile/web views.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
